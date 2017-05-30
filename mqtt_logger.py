@@ -2,17 +2,30 @@ import paho.mqtt.client as mqtt
 import peewee
 from models import Log
 from datetime import datetime
+from private_settings import *
 
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("logger/topic/add")
-    client.subscribe("logger/topic/remove")
-    client.subscribe("logger/topic/list")
+    client.subscribe(ROOT_TOPIC + "topic/add")
+    client.subscribe(ROOT_TOPIC + "topic/remove")
+    client.subscribe(ROOT_TOPIC + "topic/list")
+
+    client.subscribe(ROOT_TOPIC + "log/last")
+    client.subscribe(ROOT_TOPIC + "log/lastMinutes")
+    client.subscribe(ROOT_TOPIC + "log/lastHours")
+    client.subscribe(ROOT_TOPIC + "log/lastDays")
+    client.subscribe(ROOT_TOPIC + "log/lastWeeks")
+    client.subscribe(ROOT_TOPIC + "log/lastMonths")
+
+    client.subscribe(ROOT_TOPIC + "delete/last")
+    client.subscribe(ROOT_TOPIC + "delete/older/minutes")
+    client.subscribe(ROOT_TOPIC + "delete/older/hours")
+    client.subscribe(ROOT_TOPIC + "delete/older/days")
+    client.subscribe(ROOT_TOPIC + "delete/older/weeks")
+    client.subscribe(ROOT_TOPIC + "delete/older/months")
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -26,6 +39,6 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect("192.168.1.3", 1883, 60)
+client.connect(MQTT_HOST, MQTT_PORT, 60)
 
 client.loop_forever()

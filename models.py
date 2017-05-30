@@ -1,6 +1,7 @@
 from peewee import *
+from private_settings import *
 
-database = SqliteDatabase('mqtt.db')
+database = SqliteDatabase(DATABASE)
 
 
 class BaseModel(Model):
