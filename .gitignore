@@ -1,5 +1,9 @@
 # Created by https://www.gitignore.io/api/osx,python
 
+# Personal files
+mqtt.db
+private_settings.py
+
 ### OSX ###
 *.DS_Store
 .AppleDouble
