@@ -51,8 +51,8 @@ Included in the management commands payload should have included a json message 
 ```
 The available commands related with topics managements are the following:
 
- Command        | purpose                              |
-| ------------- |------------------| -------------------------------------|
+|Command                    | purpose          |
+| ------------------------- |------------------|
 | ROOT_TOPIC/topic/add      | add new topic to the logger |
 | ROOT_TOPIC/topic/remove   | remove topic from to the logger |
 
