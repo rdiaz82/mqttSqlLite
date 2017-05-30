@@ -35,7 +35,7 @@ In order to run the logger you only have to execute the following command:
 python mqtt_logger.py
 ```
 
-##Management commands (NOT IMPLEMENTED YET!!!)
+## Management commands (NOT IMPLEMENTED YET!!!)
 In order to add or remove the topics to the logger you can execute the following commands from any mqtt client. 
 
 The command structure is always the same, first the ```ROOT_TOPIC``` defined in your private settings followed by the desired command. For instance based on the provided private settings file a valid command could be: ```house/logger/topic/add```.
@@ -68,5 +68,5 @@ The commands related with logger content managements are the following:
 | ROOT_TOPIC/delete/older/days   | remove the log entries older than x days (included in options) for a topic (if included) or all |
 | ROOT_TOPIC/delete/all   | remove all entries for a topic (if included) or all topics |
 
-##Query Commands (NOT IMPLEMENTED YET!!!)
+## Query Commands (NOT IMPLEMENTED YET!!!)
 The query options structure are similar to the previous one. First the ```TOPIC_ROOT```followed by the desired command. In the payload should be included a json with the following structure
