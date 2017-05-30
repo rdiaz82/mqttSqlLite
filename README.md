@@ -56,8 +56,21 @@ The available commands related with topics managements are the following:
 | ------------------------- |------------------|
 | ROOT_TOPIC/topic/add      | add new topic to the logger |
 | ROOT_TOPIC/topic/remove   | remove topic from to the logger |
+| ROOT_TOPIC/topic/list   | remove topic from to the logger |
 
-With these commands a topic should be added in the json in the ```option``` field.
+The MqttSQlite logger will respond with a json with the following format:
+
+```
+{
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
+ "result" : "OK/KO",
+ "topics" : [
+ 	"registered topic 1",
+ 	"registered topic2",
+ 	...
+ 	]
+ }
+```
 
 The commands related with logger content managements are the following:
 
@@ -69,12 +82,21 @@ The commands related with logger content managements are the following:
 | ROOT_TOPIC/delete/older/days   | remove the log entries older than x days (included in options) for a topic (if included) or all |
 | ROOT_TOPIC/delete/all   | remove all entries for a topic (if included) or all topics |
 
+The MqttSqlite will respond with a json with the following structure:
+
+```
+{
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
+ "result" : "OK / KO"
+ }
+```
+
 ## Query Commands (NOT IMPLEMENTED YET!!!)
 The query options structure are similar to the previous one. First the ```TOPIC_ROOT```followed by the desired command. In the payload should be included a json with the following structure:
 
 ```
 {
- "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
  "password" : "YOUR_PASSWORD_FOR_MANAGEMENT_OPTIONS",
  "topic" : "TOPIC"
  "option" : "COMMAND_OPTION" #optional in some cases
@@ -93,8 +115,9 @@ The MqttSqlite logger will respond in the same topic with the required informati
 
 ```
 {
- "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
- "topic" : "TOPIC"
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
+ "topic" : "TOPIC",
+ "result" : "OK/KO",
  "values" : [
  	{"timestamp" : "YYYY-MM-ddTHH:mm:ss" , "value":"string_with_value"},
  	....]
