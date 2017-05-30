@@ -88,3 +88,15 @@ The complete list of available query commands is the following:
 | ROOT_TOPIC/log/minutes  | get the entries from the last x minutes |
 | ROOT_TOPIC/log/hours    | get the entries from the last x hours   |
 | ROOT_TOPIC/log/days     | get the entries from the last x days    |
+
+The MqttSqlite logger will respond in the same topic with the required information with the following json format:
+
+```
+{
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
+ "topic" : "TOPIC"
+ "values" : [
+ 	{"timestamp" : "YYYY-MM-ddTHH:mm:ss" , "value":"string_with_value"},
+ 	....]
+ }
+```
