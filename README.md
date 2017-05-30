@@ -44,6 +44,7 @@ Included in the management commands payload should have included a json message 
 
 ```
 {
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
  "password" : "YOUR_PASSWORD_FOR_MANAGEMENT_OPTIONS",
  "topic" : "TOPIC / ALL" #optional in some cases
  "option" : "COMMAND_OPTION" #optional in some cases
@@ -69,4 +70,21 @@ The commands related with logger content managements are the following:
 | ROOT_TOPIC/delete/all   | remove all entries for a topic (if included) or all topics |
 
 ## Query Commands (NOT IMPLEMENTED YET!!!)
-The query options structure are similar to the previous one. First the ```TOPIC_ROOT```followed by the desired command. In the payload should be included a json with the following structure
+The query options structure are similar to the previous one. First the ```TOPIC_ROOT```followed by the desired command. In the payload should be included a json with the following structure:
+
+```
+{
+ "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
+ "password" : "YOUR_PASSWORD_FOR_MANAGEMENT_OPTIONS",
+ "topic" : "TOPIC"
+ "option" : "COMMAND_OPTION" #optional in some cases
+ }
+```
+The complete list of available query commands is the following:
+
+| Command                 | purpose                                 |
+| ------------------------|-----------------------------------------|
+| ROOT_TOPIC/log/last     | get the last entry for a topic          |
+| ROOT_TOPIC/log/minutes  | get the entries from the last x minutes |
+| ROOT_TOPIC/log/hours    | get the entries from the last x hours   |
+| ROOT_TOPIC/log/days     | get the entries from the last x days    |
