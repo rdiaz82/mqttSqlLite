@@ -60,8 +60,8 @@ With these commands a topic should be added in the json in the ```option``` fiel
 
 The commands related with logger content managements are the following:
 
- Command        | purpose                              |
-| ------------- |------------------| -------------------------------------|
+ Command                      | purpose                              |
+| --------------------------- |------------------|
 | ROOT_TOPIC/delete/last      | remove last entry por a topic (if included) or all topics|
 | ROOT_TOPIC/delete/older/minutes   | remove the log entries older than x minutes (included in options) for a topic (if included) or all |
 | ROOT_TOPIC/delete/older/hours   | remove the log entries older than x hours (included in options) for a topic (if included) or all |
