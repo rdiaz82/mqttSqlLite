@@ -1,7 +1,6 @@
 from peewee import *
-from private_settings import *
 
-database = SqliteDatabase(DATABASE)
+database = SqliteDatabase('mqtt.db')
 
 
 class BaseModel(Model):
@@ -15,10 +14,10 @@ class Log(BaseModel):
     value = CharField()
 
 
-class topics(BaseModel):
-    topic = CharField()
+class Topic(BaseModel):
+    name = CharField()
 
 
 def create_tables():
     database.connect()
-    database.create_tables([Log], True)
+    database.create_tables([Log, Topic], True)
