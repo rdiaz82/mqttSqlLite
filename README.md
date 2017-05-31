@@ -46,8 +46,8 @@ Included in the management commands payload should have included a json message 
 {
  "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE"
  "password" : "YOUR_PASSWORD_FOR_MANAGEMENT_OPTIONS",
- "topic" : "TOPIC / ALL" #optional in some cases
- "option" : "COMMAND_OPTION" #optional in some cases
+ "topic" : "TOPIC / ALL", #optional in some cases
+ "option" : "COMMAND_OPTION", #optional in some cases
  }
 ```
 The available commands related with topics managements are the following:
@@ -64,6 +64,7 @@ The MqttSQlite logger will respond with a json with the following format:
 {
  "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
  "result" : "OK/KO",
+ "error" : "MESSAGE WITH ERROR WHEN RESULT IS KO",
  "topics" : [
  	"registered topic 1",
  	"registered topic2",
@@ -88,6 +89,7 @@ The MqttSqlite will respond with a json with the following structure:
 {
  "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
  "result" : "OK / KO"
+ "error" : "MESSAGE WITH ERROR WHEN RESULT IS KO",
  }
 ```
 
@@ -118,6 +120,7 @@ The MqttSqlite logger will respond in the same topic with the required informati
  "client" : "CLIENT_NAME_USED_TO_IDENTIFY_THE_RESPONSE",
  "topic" : "TOPIC",
  "result" : "OK/KO",
+ "error" : "MESSAGE WITH ERROR WHEN RESULT IS KO",
  "values" : [
  	{"timestamp" : "YYYY-MM-ddTHH:mm:ss" , "value":"string_with_value"},
  	....]
