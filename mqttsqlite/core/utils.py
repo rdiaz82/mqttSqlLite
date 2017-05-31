@@ -8,7 +8,7 @@ class Payload:
     options = None
     error = None
     topic = None
-    topics = None
+    topics = []
 
     def get_dictionary(self):
         payload = {}
