@@ -38,3 +38,30 @@ class Payload:
     def get_json(self):
         dict = self.get_dictionary()
         return json.dumps(dict)
+
+
+class Utils(object):
+    def missing_keys(self, received_data, keys, topic=True, options=False):
+        if topic:
+            keys.append('topic')
+        if options:
+            keys.append('options')
+        for key in keys:
+            if key not in received_data:
+                return key
+        return ''
+
+    def validate_data(self, received_data, password, keys, topic=True, options=False):
+        payload = Payload()
+        missing_keys = self.missing_keys(received_data, keys, topic, options)
+        if missing_keys == '':
+            if password == received_data['password']:
+                payload.result = 'OK'
+            else:
+                payload.result = 'KO'
+                payload.error = 'Bad Password'
+            payload.client = str(received_data['client'])
+        else:
+            payload.result = 'KO'
+            payload.error = 'Missing key - ' + missing_keys
+        return payload

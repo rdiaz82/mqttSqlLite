@@ -8,11 +8,13 @@ from mqttsqlite.core.topics_controller import TopicsController
 import json
 import mqttsqlite.settings.private_settings as Settings
 from tests.utils import msg
+from mqttsqlite.core.utils import Utils
+
 
 test_db = SqliteDatabase('test_database.db')
 
 
-class TestTopicAdd(unittest.TestCase):
+class TestTopicsController(unittest.TestCase):
     def setUp(self):
         self.payload = {}
         self.payload['client'] = "testClient"
@@ -116,7 +118,7 @@ class TestTopicAdd(unittest.TestCase):
 
     def test_list_topics(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
-            self.payload['password'] = Settings.READ_PASSWORD
+            self.payload['password'] = Settings.QUERY_PASSWORD
             self.msg.payload = json.dumps(self.payload)
             fixture = Topic.create(name='/test/topic/2')
             fixture = Topic.create(name='/test/topic/3')
@@ -137,28 +139,28 @@ class TestMissingKeys(unittest.TestCase):
         payload_dic['password'] = "BadPass"
         payload_dic['topic'] = "/test/topic/1"
         topic = TopicsController()
-        self.assertEqual('', topic._TopicsController__missing_keys(payload_dic))
+        self.assertEqual('', Utils().missing_keys(payload_dic, ['password', 'client']))
 
     def test_missing_keys_missing_client(self):
         payload_dic = {}
         payload_dic['password'] = "BadPass"
         payload_dic['topic'] = "/test/topic/1"
         topic = TopicsController()
-        self.assertEqual('client', topic._TopicsController__missing_keys(payload_dic))
+        self.assertEqual('client', Utils().missing_keys(payload_dic, ['password', 'client']))
 
     def test_missing_keys_missing_password(self):
         payload_dic = {}
         payload_dic['client'] = "testClient"
         payload_dic['topic'] = "/test/topic/1"
         topic = TopicsController()
-        self.assertEqual('password', topic._TopicsController__missing_keys(payload_dic))
+        self.assertEqual('password', Utils().missing_keys(payload_dic, ['password', 'client']))
 
     def test_missing_keys_missing_topic(self):
         payload_dic = {}
         payload_dic['client'] = "testClient"
         payload_dic['password'] = "BadPass"
         topic = TopicsController()
-        self.assertEqual('topic', topic._TopicsController__missing_keys(payload_dic))
+        self.assertEqual('topic', Utils().missing_keys(payload_dic, ['password', 'client']))
 
     def test_missing_keys_missing_options(self):
         payload_dic = {}
@@ -166,7 +168,7 @@ class TestMissingKeys(unittest.TestCase):
         payload_dic['password'] = "BadPass"
         payload_dic['topic'] = "/test/topic/1"
         topic = TopicsController()
-        self.assertEqual('options', topic._TopicsController__missing_keys(payload_dic, options=True))
+        self.assertEqual('options', Utils().missing_keys(payload_dic, ['password', 'client'], options=True))
 
     def test_missing_keys_ignoring_topic(self):
         payload_dic = {}
@@ -174,7 +176,7 @@ class TestMissingKeys(unittest.TestCase):
         payload_dic['password'] = "BadPass"
         payload_dic['topic'] = "/test/topic/1"
         topic = TopicsController()
-        self.assertEqual('', topic._TopicsController__missing_keys(payload_dic, topic=False))
+        self.assertEqual('', Utils().missing_keys(payload_dic, ['password', 'client'], topic=False))
 
 if __name__ == '__main__':
     unittest.main()
