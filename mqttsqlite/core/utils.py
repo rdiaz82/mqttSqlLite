@@ -1,4 +1,11 @@
 import json
+from enum import Enum
+
+
+class Time_Range(Enum):
+    minutes = 60
+    hours = 3600
+    days = 86400
 
 
 class Payload:
@@ -9,6 +16,7 @@ class Payload:
     error = None
     topic = None
     topics = []
+    values = None
 
     def get_dictionary(self):
         payload = {}
@@ -32,6 +40,9 @@ class Payload:
 
         if self.topics:
             payload['topics'] = self.topics
+
+        if self.values:
+            payload['values'] = self.values
 
         return payload
 
@@ -60,8 +71,9 @@ class Utils(object):
             else:
                 payload.result = 'KO'
                 payload.error = 'Bad Password'
-            payload.client = str(received_data['client'])
         else:
             payload.result = 'KO'
             payload.error = 'Missing key - ' + missing_keys
+        if 'client' in received_data:
+            payload.client = received_data['client']
         return payload

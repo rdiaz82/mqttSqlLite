@@ -24,4 +24,25 @@ class LogController(object):
             query_logs.append({'timestamp': log.timestamp, 'value': log.value})
         return query_logs
 
+    def __get_last_entry_from_topic(self, topic):
+        try:
+            result = Log.select().where(Log.topic == topic).order_by(Log.timestamp.desc()).get()
+            return {'timestamp': result.timestamp, 'value': result.value}
+        except:
+            return {}
+
+    def get_topic_entries(self, msg):
+        topic = msg.topic.split('/')
+        payload = Payload()
+        received_data = json.loads(msg.payload)
+        if topic[-1] == 'last':
+            payload = Utils().validate_data(received_data, QUERY_PASSWORD, ['password', 'client'])
+            if payload.result == 'OK':
+                return 'last'
+        elif topic[-1] == 'minutes' or topic[-1] == 'hours' or topic[-1] == 'days':
+            return 'range'
+        else:
+            return 'error'
+
+
 
