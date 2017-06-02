@@ -61,7 +61,7 @@ class TestLogsController(unittest.TestCase):
             logs = LogController()
             query_result = logs._LogController__get_logs_newer_than('/test/topic', 25)
             self.assertEqual(2, len(query_result))
-'''
+
     def test_private_method_get_last_entry_from_topic(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
             Log.create(timestamp=datetime.now() - timedelta(seconds=30), value="12", topic='/test/topic')
@@ -73,7 +73,7 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=datetime.now(), value="12", topic='/test/topic3')
             logs = LogController()
             query_result = logs._LogController__get_last_entry_from_topic('/test/topic')
-            self.assertEqual(timestamp, query_result['timestamp'])
+            self.assertEqual(timestamp.strftime("%Y-%m-%d %H:%M:%S"), query_result['timestamp'])
 
     def test_private_method_get_last_entry_from_invalid_topic(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
@@ -95,7 +95,7 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=timestamp, value="12", topic='/test/topic')
             logs = LogController()
             query_result = logs._LogController__get_last_entry_from_topic('/test/topic')
-            self.assertEqual(timestamp, query_result['timestamp'])
+            self.assertEqual(timestamp.strftime("%Y-%m-%d %H:%M:%S"), query_result['timestamp'])
 
     def test_get_last_entry_from_topic(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
@@ -107,9 +107,8 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=timestamp, value="12", topic='/test/topic')
             logs = LogController()
             query_result = logs.get_topic_entries(self.msg)
-            print(query_result)
             dic_result = json.loads(query_result)
-            self.assertEqual(timestamp, dic_result['values'][0]['timestamp'])
+            self.assertEqual(timestamp.strftime("%Y-%m-%d %H:%M:%S"), dic_result['values'][0]['timestamp'])
 
     def test_get_entries_newer_than_25_minutes(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
@@ -120,7 +119,8 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=datetime.now() - timedelta(minutes=10), value="12", topic='/test/topic')
             logs = LogController()
             query_result = logs.get_topic_entries(self.msg)
-            self.assertEqual(2, query_result)
+            dic_result = json.loads(query_result)
+            self.assertEqual(2, len(dic_result['values']))
 
     def test_get_entries_newer_than_25_hours(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
@@ -131,7 +131,8 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=datetime.now() - timedelta(hours=10), value="12", topic='/test/topic')
             logs = LogController()
             query_result = logs.get_topic_entries(self.msg)
-            self.assertEqual(2, query_result)
+            dic_result = json.loads(query_result)
+            self.assertEqual(2, len(dic_result['values']))
 
     def test_get_entries_newer_than_25_days(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
@@ -142,7 +143,38 @@ class TestLogsController(unittest.TestCase):
             Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
             logs = LogController()
             query_result = logs.get_topic_entries(self.msg)
-            self.assertEqual(2, query_result)
-'''
+            dic_result = json.loads(query_result)
+            self.assertEqual(2, len(dic_result['values']))
+
+    def test_get_entries_newer_than_25_days_invalid_password(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/log/days'
+            self.payload['password'] = 'badPassword'
+            self.msg.payload = json.dumps(self.payload)
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic2')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.get_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual('KO', dic_result['result'])
+            self.assertFalse('values' in dic_result)
+
+    def test_get_entries_newer_than_25_days_invalid_options(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/log/days'
+            self.payload['options'] = 'invalidOptions'
+            self.msg.payload = json.dumps(self.payload)
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic2')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.get_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual('KO', dic_result['result'])
+            self.assertFalse('values' in dic_result)
+
 if __name__ == '__main__':
     unittest.main()
