@@ -176,5 +176,146 @@ class TestLogsController(unittest.TestCase):
             self.assertEqual('KO', dic_result['result'])
             self.assertFalse('values' in dic_result)
 
+    def test_get_entries_newer_than_25_days_invalid_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/log/days'
+            self.payload['topic'] = '/test/invalid/topic'
+            self.msg.payload = json.dumps(self.payload)
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic2')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.get_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual('OK', dic_result['result'])
+            self.assertFalse('values' in dic_result)
+
+    def test_private_method_delete_last_entry_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            result = logs._LogController__delete_last_entry_from_topic('/test/topic')
+            self.assertTrue(result)
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_private_method_delete_last_entry_from_non_existing_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            result = logs._LogController__delete_last_entry_from_topic('/test/topic2')
+            self.assertTrue(result)
+            data_after_delete = Log.select()
+            self.assertEqual(3, data_after_delete.count())
+
+    def test_private_method_delete_entries_older_than_from_existing_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            Log.create(timestamp=datetime.now() - timedelta(seconds=50), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=40), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=10), value="12", topic='/test/topic')
+            logs = LogController()
+            result = logs._LogController__delete_entries_from_topic_older_than('/test/topic', 25)
+            self.assertEqual(3, result)
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_private_method_delete_entries_older_than_from_non_existing_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            Log.create(timestamp=datetime.now() - timedelta(seconds=50), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=40), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=10), value="12", topic='/test/topic')
+            logs = LogController()
+            result = logs._LogController__delete_entries_from_topic_older_than('/test/topic2', 25)
+            self.assertEqual('0', result)
+            data_after_delete = Log.select()
+            self.assertEqual(5, data_after_delete.count())
+
+    def test_delete_last_entry_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/last'
+            Log.create(timestamp=datetime.now() - timedelta(seconds=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(seconds=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertTrue(dic_result['values'])
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_delete_older_than_x_minutes_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/minutes'
+            Log.create(timestamp=datetime.now() - timedelta(minutes=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(minutes=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(minutes=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual(1, dic_result['values'])
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_delete_older_than_x_hours_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/hours'
+            Log.create(timestamp=datetime.now() - timedelta(hours=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(hours=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(hours=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual(1, dic_result['values'])
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_delete_older_than_x_days_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/days'
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual(1, dic_result['values'])
+            data_after_delete = Log.select()
+            self.assertEqual(2, data_after_delete.count())
+
+    def test_delete_older_than_x_days_from_non_existing_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/days'
+            self.payload['topic'] = '/test/invalid/topic'
+            self.msg.payload = json.dumps(self.payload)
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual('0', dic_result['values'])
+            data_after_delete = Log.select()
+            self.assertEqual(3, data_after_delete.count())
+
+    def test_delete_older_than_x_invalid_unit_time_from_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.msg.topic = Settings.ROOT_TOPIC + '/delete/years'
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic')
+            logs = LogController()
+            query_result = logs.delete_topic_entries(self.msg)
+            dic_result = json.loads(query_result)
+            self.assertEqual('KO', dic_result['result'])
+
 if __name__ == '__main__':
     unittest.main()

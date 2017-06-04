@@ -24,6 +24,27 @@ class LogController(object):
             query_logs.append({'timestamp': log.timestamp.strftime("%Y-%m-%d %H:%M:%S"), 'value': log.value})
         return query_logs
 
+    def __delete_entries_from_topic_older_than(self, topic, date):
+        query = Log.delete().where((Log.timestamp <= datetime.now() - timedelta(seconds=date)) & (Log.topic == topic))
+        result = query.execute()
+        if result:
+            return result
+        else:
+            return '0'
+
+    def __delete_last_entry_from_topic(self, topic):
+        try:
+            last_entry = Log.select().where(Log.topic == topic).order_by(Log.id.desc()).get()
+            result = last_entry.delete_instance()
+            if result == 1:
+                return '1'
+            else:
+                return '0'
+        except Log.DoesNotExist:
+            return '1'
+        except:
+            return '0'
+
     def __get_last_entry_from_topic(self, topic):
         try:
             result = Log.select().where(Log.topic == topic).order_by(Log.timestamp.desc()).get()
@@ -31,14 +52,21 @@ class LogController(object):
         except:
             return {}
 
-    def get_topic_entries(self, msg):
+    def __time_operations_with_topic_entries(self, operation, msg):
+        if operation == 'delete':
+            single = self.__delete_last_entry_from_topic
+            multiple = self.__delete_entries_from_topic_older_than
+        else:
+            single = self.__get_last_entry_from_topic
+            multiple = self.__get_logs_newer_than
+
         topic = msg.topic.split('/')
         payload = Payload()
         received_data = json.loads(msg.payload)
         if topic[-1] == 'last':
             payload = Utils().validate_data(received_data, QUERY_PASSWORD, ['password', 'client'])
             if payload.result == 'OK':
-                payload.values = [self.__get_last_entry_from_topic(received_data['topic'])]
+                payload.values = [single(received_data['topic'])]
         elif topic[-1] == 'minutes' or topic[-1] == 'hours' or topic[-1] == 'days':
             payload = Utils().validate_data(received_data, QUERY_PASSWORD, ['password', 'client'], options=True)
             if payload.result == 'OK':
@@ -50,13 +78,19 @@ class LogController(object):
                     return payload.get_json()
 
                 if topic[-1] == 'minutes':
-                    payload.values = self.__get_logs_newer_than(received_data['topic'], Time_Range.minutes.value * received_options)
+                    payload.values = multiple(received_data['topic'], Time_Range.minutes.value * received_options)
                 elif topic[-1] == 'hours':
-                    payload.values = self.__get_logs_newer_than(received_data['topic'], Time_Range.hours.value * received_options)
+                    payload.values = multiple(received_data['topic'], Time_Range.hours.value * received_options)
                 elif topic[-1] == 'days':
-                    payload.values = self.__get_logs_newer_than(received_data['topic'], Time_Range.days.value * received_options)
+                    payload.values = multiple(received_data['topic'], Time_Range.days.value * received_options)
         else:
-            return 'error'
+            payload.result = 'KO'
+            payload.error = 'Invalid unit time'
+
         return payload.get_json()
 
+    def get_topic_entries(self, msg):
+        return self.__time_operations_with_topic_entries('get', msg)
 
+    def delete_topic_entries(self, msg):
+        return self.__time_operations_with_topic_entries('delete', msg)
