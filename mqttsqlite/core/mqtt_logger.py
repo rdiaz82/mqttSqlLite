@@ -4,28 +4,21 @@ from models import Log
 from datetime import datetime
 from private_settings import *
 from topics_controller import Topics
+from mqtt_controller import MqttController
 
 
-# The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
-
-    client.subscribe(ROOT_TOPIC + "topic/*")
-    client.subscribe(ROOT_TOPIC + "log/*")
-    client.subscribe(ROOT_TOPIC + "delete/*")
+    mqtt_controller = MqttController()
+    mqtt_controller.on_connect(client)
 
 
-# The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    if 'topic' in msg.topic:
-        topics = Topics()
-        response = topics.process_request(msg)
-    elif 'log':
-        
+    
+    mqtt_controller.on_message(client, msg)
 
-    #log_register = Log(timestamp=datetime.now(), topic=msg.topic, value=str(msg.payload))
-    #log_register.save()
-    #for log_entry in Log.select():
+    # log_register = Log(timestamp=datetime.now(), topic=msg.topic, value=str(msg.payload))
+    # log_register.save()
+    # for log_entry in Log.select():
     #    print(log_entry.timestamp.isoformat() + " " + log_entry.topic + " " + log_entry.value)
 
 client = mqtt.Client()

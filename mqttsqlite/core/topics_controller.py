@@ -42,3 +42,6 @@ class TopicsController (object):
                 saved_topics.append(topic.name)
             payload.topics = saved_topics
         return payload.get_json()
+
+    def get_storaged_topics(self):
+        return Topic.select()
