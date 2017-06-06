@@ -5,6 +5,7 @@ from datetime import datetime
 from private_settings import *
 from topics_controller import Topics
 from mqtt_controller import MqttController
+import re
 
 
 def on_connect(client, userdata, flags, rc):
@@ -13,8 +14,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    
-    mqtt_controller.on_message(client, msg)
+        mqtt_controller.on_message(client, msg)
 
     # log_register = Log(timestamp=datetime.now(), topic=msg.topic, value=str(msg.payload))
     # log_register.save()

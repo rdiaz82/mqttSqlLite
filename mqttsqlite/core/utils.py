@@ -76,4 +76,6 @@ class Utils(object):
             payload.error = 'Missing key - ' + missing_keys
         if 'client' in received_data:
             payload.client = received_data['client']
+        if 'topic' in received_data:
+            payload.topic = received_data['topic']
         return payload

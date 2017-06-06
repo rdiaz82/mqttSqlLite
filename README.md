@@ -77,11 +77,11 @@ The commands related with logger content managements are the following:
 
  Command                      | purpose                              |
 | --------------------------- |------------------|
-| ROOT_TOPIC/delete/last      | remove last entry por a topic (if included) or all topics|
-| ROOT_TOPIC/delete/older/minutes   | remove the log entries older than x minutes (included in options) for a topic (if included) or all |
-| ROOT_TOPIC/delete/older/hours   | remove the log entries older than x hours (included in options) for a topic (if included) or all |
-| ROOT_TOPIC/delete/older/days   | remove the log entries older than x days (included in options) for a topic (if included) or all |
-| ROOT_TOPIC/delete/all   | remove all entries for a topic (if included) or all topics |
+| ROOT_TOPIC/log/delete/last      | remove last entry por a topic (if included) or all topics|
+| ROOT_TOPIC/log/delete/minutes   | remove the log entries older than x minutes (included in options) for a topic (if included) or all |
+| ROOT_TOPIC/log/delete/hours   | remove the log entries older than x hours (included in options) for a topic (if included) or all |
+| ROOT_TOPIC/log/delete/days   | remove the log entries older than x days (included in options) for a topic (if included) or all |
+| ROOT_TOPIC/log/delete/all   | remove all entries for a topic (if included) or all topics |
 
 The MqttSqlite will respond with a json with the following structure:
 
