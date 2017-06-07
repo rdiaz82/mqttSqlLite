@@ -45,3 +45,9 @@ class TopicsController (object):
 
     def get_storaged_topics(self):
         return Topic.select()
+
+    def is_topic_subscribed(self, topic):
+        if Topic.select().where(Topic.name == topic).count():
+            return True
+        else:
+            return False

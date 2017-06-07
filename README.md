@@ -106,12 +106,12 @@ The query options structure are similar to the previous one. First the ```TOPIC_
 ```
 The complete list of available query commands is the following:
 
-| Command                 | purpose                                 |
-| ------------------------|-----------------------------------------|
-| ROOT_TOPIC/log/last     | get the last entry for a topic          |
-| ROOT_TOPIC/log/minutes  | get the entries from the last x minutes |
-| ROOT_TOPIC/log/hours    | get the entries from the last x hours   |
-| ROOT_TOPIC/log/days     | get the entries from the last x days    |
+| Command                       | purpose                                 |
+| ------------------------------|-----------------------------------------|
+| ROOT_TOPIC/log/query/last     | get the last entry for a topic          |
+| ROOT_TOPIC/log/query/minutes  | get the entries from the last x minutes |
+| ROOT_TOPIC/log/query/hours    | get the entries from the last x hours   |
+| ROOT_TOPIC/log/query/days     | get the entries from the last x days    |
 
 The MqttSqlite logger will respond in the same topic with the required information with the following json format:
 

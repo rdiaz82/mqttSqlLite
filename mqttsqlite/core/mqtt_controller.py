@@ -1,7 +1,9 @@
 from topics_controller import TopicsController
+from logs_controller import LogController
 from ..settings.private_settings import ROOT_TOPIC
 import topics_controller
 import logs_controller
+from utils import Payload
 import re
 import json
 
@@ -36,18 +38,41 @@ class MqttController(object):
                 result_dic = json.loads(result)
                 client.publish(msg.topic, result)
             else:
-                # TODO: return error
-                print ('error')
+                response = Payload()
+                response.result = 'KO'
+                response.error = 'Error: Invalid Topic Option'
+                received_msg = json.loads(msg.payload)
+                if 'client' in received_msg:
+                    response.client = received_msg['client']
+                client.publish(msg.topic, response.get_json())
+
+    def __process_log(self, client, msg):
+        action = re.findall(ROOT_TOPIC + 'log/(\w*)', msg.topic)[0]
+        if action == 'query':
+            controller = LogController()
+            result = controller.get_topic_entries(msg)
+            client.publish(msg.topic, result)
+        elif action == 'delete':
+            controller = LogController()
+            result = controller.delete_topic_entries(msg)
+            client.publish(msg.topic, result)
+        else:
+            response = Payload()
+            response.result = 'KO'
+            response.error = 'Error: Invalid Log Option'
+            received_msg = json.loads(msg.payload)
+            if 'client' in received_msg:
+                response.client = received_msg['client']
+            client.publish(msg.topic, response.get_json())
 
     def on_message(self, client, msg):
         if re.search('^' + ROOT_TOPIC + 'topic/', msg.topic):
             self.__process_topic(client, msg)
 
         elif re.search('^' + ROOT_TOPIC + 'log/', msg.topic):
-            # TODO: log with all variants
-            print('logs')
+            self.__process_log(client, msg)
         else:
-            # TODO: check if the current topic is one of the topics storaged in the database
-            print ('log?')
-
-        return True
+            topic_controller = TopicsController()
+            if topic_controller.is_topic_subscribed(msg.topic):
+                controller = LogController()
+                controller.add_entry(msg)
