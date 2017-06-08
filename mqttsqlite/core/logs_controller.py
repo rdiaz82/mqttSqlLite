@@ -1,7 +1,7 @@
 import json
-from ..settings.private_settings import MANAGEMENT_PASSWORD, QUERY_PASSWORD
-from utils import Payload, Utils, Time_Range
-from ..orm.models import Log
+from mqttsqlite.settings.private_settings import MANAGEMENT_PASSWORD, QUERY_PASSWORD
+from .utils import Payload, Utils
+from mqttsqlite.orm.models import Log
 from datetime import datetime, timedelta
 
 
@@ -78,11 +78,11 @@ class LogController(object):
                     return payload.get_json()
 
                 if topic[-1] == 'minutes':
-                    payload.values = multiple(received_data['topic'], Time_Range.minutes.value * received_options)
+                    payload.values = multiple(received_data['topic'], 60 * received_options)
                 elif topic[-1] == 'hours':
-                    payload.values = multiple(received_data['topic'], Time_Range.hours.value * received_options)
+                    payload.values = multiple(received_data['topic'], 3600 * received_options)
                 elif topic[-1] == 'days':
-                    payload.values = multiple(received_data['topic'], Time_Range.days.value * received_options)
+                    payload.values = multiple(received_data['topic'], 86400 * received_options)
         else:
             payload.result = 'KO'
             payload.error = 'Invalid unit time'

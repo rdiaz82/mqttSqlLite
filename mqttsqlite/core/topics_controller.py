@@ -1,7 +1,7 @@
-from ..orm.models import Topic
+from mqttsqlite.orm.models import Topic
 import json
-from ..settings.private_settings import MANAGEMENT_PASSWORD, QUERY_PASSWORD
-from utils import Payload, Utils
+from mqttsqlite.settings.private_settings import MANAGEMENT_PASSWORD, QUERY_PASSWORD
+from .utils import Payload, Utils
 
 
 class TopicsController (object):

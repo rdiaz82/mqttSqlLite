@@ -1,9 +1,7 @@
-from topics_controller import TopicsController
-from logs_controller import LogController
+from .topics_controller import TopicsController
+from .logs_controller import LogController
 from ..settings.private_settings import ROOT_TOPIC
-import topics_controller
-import logs_controller
-from utils import Payload
+from .utils import Payload
 import re
 import json
 
@@ -15,7 +13,8 @@ class MqttController(object):
         storaged_topics = controller.get_storaged_topics()
         for topic in storaged_topics:
             client.subscribe(topic.name)
-        return True
+        client.subscribe(ROOT_TOPIC + 'topic/#')
+        client.subscribe(ROOT_TOPIC + 'log/#')
 
     def __process_topic(self, client, msg):
         action = re.findall(ROOT_TOPIC + 'topic/(\w*)', msg.topic)[0]
@@ -26,17 +25,17 @@ class MqttController(object):
                 result_dic = json.loads(result)
                 if result_dic['result'] == 'OK':
                     client.subscribe(result_dic['topic'])
-                client.publish(msg.topic, result)
+                client.publish(ROOT_TOPIC + 'response', result)
             elif action == 'remove':
                 result = controller.remove_topic(msg)
                 result_dic = json.loads(result)
                 if result_dic['result'] == 'OK':
                     client.unsubscribe(result_dic['topic'])
-                client.publish(msg.topic, result)
+                client.publish(ROOT_TOPIC + 'response', result)
             elif action == 'list':
                 result = controller.list_topics(msg)
                 result_dic = json.loads(result)
-                client.publish(msg.topic, result)
+                client.publish(ROOT_TOPIC + 'response', result)
             else:
                 response = Payload()
                 response.result = 'KO'
@@ -44,18 +43,18 @@ class MqttController(object):
                 received_msg = json.loads(msg.payload)
                 if 'client' in received_msg:
                     response.client = received_msg['client']
-                client.publish(msg.topic, response.get_json())
+                client.publish(ROOT_TOPIC + 'response', response.get_json())
 
     def __process_log(self, client, msg):
         action = re.findall(ROOT_TOPIC + 'log/(\w*)', msg.topic)[0]
         if action == 'query':
             controller = LogController()
             result = controller.get_topic_entries(msg)
-            client.publish(msg.topic, result)
+            client.publish(ROOT_TOPIC + 'response', result)
         elif action == 'delete':
             controller = LogController()
             result = controller.delete_topic_entries(msg)
-            client.publish(msg.topic, result)
+            client.publish(ROOT_TOPIC + 'response', result)
         else:
             response = Payload()
             response.result = 'KO'
@@ -63,7 +62,7 @@ class MqttController(object):
             received_msg = json.loads(msg.payload)
             if 'client' in received_msg:
                 response.client = received_msg['client']
-            client.publish(msg.topic, response.get_json())
+            client.publish(ROOT_TOPIC + 'response', response.get_json())
 
     def on_message(self, client, msg):
         if re.search('^' + ROOT_TOPIC + 'topic/', msg.topic):

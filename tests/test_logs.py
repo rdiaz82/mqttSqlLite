@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from mqttsqlite.orm.models import Log, Topic
 from tests.utils import msg
 from mqttsqlite.core.logs_controller import LogController
-from mqttsqlite.core.utils import Time_Range
 import mqttsqlite.settings.private_settings as Settings
 import json
 

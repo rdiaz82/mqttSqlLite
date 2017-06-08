@@ -6,7 +6,6 @@ from mqttsqlite.orm.models import Log, Topic
 from tests.utils import msg, Mock_Client
 from mqttsqlite.core.logs_controller import LogController
 from mqttsqlite.core.mqtt_controller import MqttController
-from mqttsqlite.core.utils import Time_Range
 import mqttsqlite.settings.private_settings as Settings
 import json
 
@@ -35,7 +34,7 @@ class TestMqttController(unittest.TestCase):
             Topic.create(name='/test/topic/test3')
             mqtt_controller = MqttController()
             mqtt_controller.on_connect(self.client)
-            self.assertEqual(3, len(self.client.subscribed_topics))
+            self.assertEqual(5, len(self.client.subscribed_topics))
 
     def test_on_message_add_topic(self):
         with test_database(test_db, (Log, Topic), create_tables=True):

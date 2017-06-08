@@ -1,11 +1,4 @@
 import json
-from enum import Enum
-
-
-class Time_Range(Enum):
-    minutes = 60
-    hours = 3600
-    days = 86400
 
 
 class Payload:
