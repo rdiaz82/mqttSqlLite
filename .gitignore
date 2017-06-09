@@ -3,7 +3,7 @@
 # Personal files
 mqtt.db
 test_database.db
-private_settings.py
+README
 
 ### OSX ###
 *.DS_Store
