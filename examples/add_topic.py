@@ -16,8 +16,9 @@ payload['password'] = MANAGEMENT_PASSWORD
 
 def on_connect(client, userdata, flags, rc):
     client_topic = ROOT_TOPIC + 'topic/add'
-    client.publish(client_topic, json.dumps(payload))
     client.subscribe(ROOT_TOPIC + 'response')
+    client.publish(client_topic, json.dumps(payload))
+
 
 
 def on_message(client, userdata, msg):
