@@ -7,7 +7,7 @@ The logger is totally managed over mqtt, so you can add, remove or query your to
 The mqttSqLite logger is developed in python and use the peewee package as database provider and paho as mqtt client. In order to install the logger you need pip installed in your computer, and you only need to execute the following command:
 
 ```
-pip install mqttsqlite
+pip install MqttSqliteLogger
 ```
 Mqttsqlite support some comand line arguments that allows the the logger configuration according to your needs. The supported commands are the following:
 

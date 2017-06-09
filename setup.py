@@ -11,7 +11,7 @@ setup(
     entry_points={
         'console_scripts': ['mqttsqlite = mqttsqlite.mqttsqlite:main']
     },
-    version='1.07',
+    version='1.0',
     description='Simple Sqlite logger for MQTT Brokers.',
     author='Roberto Diaz Ortega',
     author_email='info@rdiaz.es',
