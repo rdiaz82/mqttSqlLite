@@ -409,6 +409,30 @@ class TestMqttController(unittest.TestCase):
             self.assertEqual('OK', json.loads(self.client.last_publish)['result'])
             self.assertEqual('0', json.loads(self.client.last_publish)['values'])
 
+
+    def test_delete_entries_older_than_10_days_from_invalid_topic(self):
+        with test_database(test_db, (Log, Topic), create_tables=True):
+            self.client.subscribe('/test/topic/test1')
+            self.client.subscribe('/test/topic/test2')
+            self.client.subscribe('/test/topic/test3')
+            Topic.create(name='/test/topic/test1')
+            Topic.create(name='/test/topic/test2')
+            Topic.create(name='/test/topic/test3')
+
+            Log.create(timestamp=datetime.now() - timedelta(days=40), value="12", topic='/test/topic/test1')
+            Log.create(timestamp=datetime.now() - timedelta(days=30), value="12", topic='/test/topic/test1')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic2/test2')
+            Log.create(timestamp=datetime.now() - timedelta(days=20), value="12", topic='/test/topic/test1')
+            Log.create(timestamp=datetime.now() - timedelta(days=10), value="12", topic='/test/topic/test1')
+            self.payload['options'] = 10
+            self.payload['password'] = Settings.QUERY_PASSWORD
+            self.payload['topic'] = '/test/topic/invalid_topic'
+            self.msg = msg(topic=Settings.ROOT_TOPIC + 'log/delete/days', payload=json.dumps(self.payload))
+            mqtt_controller = MqttController()
+            result = mqtt_controller.on_message(self.client, self.msg)
+            self.assertEqual('OK', json.loads(self.client.last_publish)['result'])
+            self.assertEqual('0', json.loads(self.client.last_publish)['values'])
+
     def test_on_message_invalid_log_action(self):
         with test_database(test_db, (Log, Topic), create_tables=True):
             self.client.subscribed_topics = []
