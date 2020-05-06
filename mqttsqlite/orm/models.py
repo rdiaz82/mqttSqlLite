@@ -1,5 +1,6 @@
 from peewee import *
 
+# todo: refactor to remove global variable and hard coded database name
 database = SqliteDatabase('mqtt.db')
 
 
@@ -25,8 +26,10 @@ class Setting(BaseModel):
 
 def create_tables():
     print('Creating_tables')
-    database.get_conn()
-    database.create_tables([Log, Topic, Setting], True)
+    database = SqliteDatabase('mqtt.db')
+
+    database.connection()
+    database.create_tables([Log, Topic, Setting], safe=True)
     print('Populate Settings')
     Setting.create(key='mqtt_host', value='localhost')
     Setting.create(key='mqtt_port', value='1883')
