@@ -25,7 +25,7 @@ def on_message(client, userdata, msg):
     received_data = json.loads(msg.payload)
     if 'client' in received_data:
         if received_data['client'] == payload['client']:
-            print('Received Meesage from Logger: ')
+            print('Received Message from Logger: ')
             print(received_data)
             client.disconnect()
 
