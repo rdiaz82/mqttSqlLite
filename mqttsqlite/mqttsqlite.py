@@ -13,11 +13,12 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    print('received message')
-    print(msg.topic + ' : ' + str(msg.payload))
+    # todo: add debug flag to turn these print messages on or off
+    #print('received message')
+    #print(msg.topic + ' : ' + str(msg.payload))
     mqtt_controller = MqttController()
     mqtt_controller.on_message(client, msg)
-    print('proccessed Message')
+    #print('proccessed Message')
 
 
 def init_settings(args):
@@ -33,7 +34,7 @@ def init_settings(args):
     if args.mqtt_port is not '1883':
         set_port(args.mqtt_port)
     if args.root_topic is not 'logger/':
-        set_root_topic(args.mqtt_port)
+        set_root_topic(args.root_topic)
     if args.management_password is not 'admin1234':
         set_management_pass(args.management_password)
     if args.query_password is not 'query1234':

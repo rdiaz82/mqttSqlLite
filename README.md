@@ -197,19 +197,28 @@ payload['topic'] = desired_topic
 payload['options'] = 20
 payload['password'] = QUERY_PASSWORD
 
+# global variable to hold result
+output_data = None
+# global variable to hold result... this is a very bad idea:
+# received_data = None
 
 def on_connect(client, userdata, flags, rc):
-    client_topic = ROOT_TOPIC + 'log/query/minutes'
-    client.subscribe(ROOT_TOPIC + 'response') #importanat subscribe to response topic before request to the logger
+    client_topic = ROOT_TOPIC + COMMAND
+    client.subscribe(ROOT_TOPIC + 'response') #important to subscribe to response topic before request to the logger
     client.publish(client_topic, json.dumps(payload))
 
 
 def on_message(client, userdata, msg):
+    global output_data
+    #output_data['cause error']
     received_data = json.loads(msg.payload)
+    # check if the message is from a client
     if 'client' in received_data:
+        # process data if the message is from this client
         if received_data['client'] == payload['client']:
-            print('Received Meesage from Logger: ')
-            print(received_data)
+            print('Received Message for client %s from Logger' % payload['client'])
+            # save the data to be processed outside of this callback function
+            output_data = received_data
             client.disconnect()
 
 client = mqtt.Client()
@@ -219,12 +228,16 @@ client.on_message = on_message
 client.connect(MQTT_HOST, MQTT_PORT, 60)
 
 client.loop_forever()
+# print the data
+print('Received Data:')
+print(output_data)
 ```
 
 The response obtained could be similar to the following:
 
 ```
-Received Meesage from Logger:
+Received Message for client simple_example from Logger
+Received Data:
 {u'topic': u'desired_topic', u'client': u'simple_example', u'values': [{u'timestamp':
 u'2017-06-09 22:55:21', u'value': u'71'}, {u'timestamp': u'2017-06-09 22:56:14', u'val
 ue': u'74'}, {u'timestamp': u'2017-06-09 22:56:15', u'value': u'74'}], u'result': u'OK
